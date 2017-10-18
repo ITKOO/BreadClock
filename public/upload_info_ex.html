@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>빵집 정보 올리기</title>
+<head>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="/css/materialize.css"  media="screen,projection"/>
+  <style> #CONTENTS{ min-height: 1000px; }</style>
+</head>
+
+<body>
+
+  <!-- 상단 네비게이션 -->
+  <nav class="deep-orange darken-1">
+    <div class="nav-wrapper">
+      <div class="container">
+        <a href="#" class="breadcrumb">BreadClock</a>
+
+        <button id = "BTN_LOGOUT" type = "button" class = "btn white right black-text ">로 그 아 웃</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 내용 부분 -->
+  <div class="container" id="CONTENTS">
+    <form id="FRM">
+    <div class="row z-depth-1">
+      <div class="col s12"><h3>의 알람을 추가한 사용자들에게 메세지를 전송하세요!</h3></div>
+        <div class="col s12">
+          <!-- TODO 첨부파일 input 태그 확인 -->
+            <button id="BTN_PUSH" type="button" class="btn deep-orange darken-4">메세지 전송</button>
+              <br><br><br>
+        </div>
+          <hr width = 100%>
+
+      <div class="col s12"><h3>빵집 사진 업로드</h3></div>
+      <div class="col l12 m12 s12 input-field">
+        <div class="file-field input-field">
+          <div class="btn deep-orange darken-1">
+          <!-- TODO 첨부파일 input 태그 확인 -->
+            <span>파일선택</span><input type="file" id="INPUT_FILE">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text">
+          </div>
+        </div>
+      </div>
+      <div class="col l12 m12 s12 input-field">
+        <!-- TODO 메모 내용 input 태그 확인 -->
+       <input id="INPUT_MESSAGE" type="text" class="validate">
+       <label for="INPUT_MESSAGE">사진 이름 ex) 대문 사진</label>
+      </div>
+      <div class="col l12 m12 s12 input-field">
+        <!-- TODO 메모 작성 버튼 확인 -->
+        <button id="BTN_WRITE" type="button" class="btn deep-orange darken-4">사진 업로드하기</button>
+      </div>
+      <br><br><br><br><span class="white-text">dummy string</span>
+    </div>
+    </form>
+
+    <!-- 메모 내용 읽어오기 영역 -->
+    <div class="row">
+      <div class="col s12 center">
+        <!-- TODO 로딩 프로그래스용 프리로더 -->
+        <div class="preloader-wrapper big active" id="PROGRESS">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left"><div class="circle"></div></div>
+            <div class="gap-patch"><div class="circle"></div></div>
+            <div class="circle-clipper right"><div class="circle"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- TODO 기록된 메모들을 읽어올 UL 태그 -->
+    <ul class="collapsible" data-collapsible="expandable" id="READ_PHOTO"></ul>
+  </div>
+
+  <!-- 바닥글 영역 -->
+  <footer class="page-footer deep-orange darken-1">
+    <div class="container">
+    <div class="footer-copyright">
+      <div class="container">
+      Copyright &copy; BreadClock
+      <a class="white-text right" >developed by ITKOO</a>
+      </div>
+    </div>
+    </div>
+  </footer>
+
+<!-- /////////////////////////////////// javascript 스크립트 영역 /////////////////////////////////// -->
+
+
+  <!--Import jQuery before materialize.js-->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="/js/materialize.min.js"></script>
+  <!-- 1. firebase SDK 링크 (auth, db, storage 모두) -->
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase-storage.js"></script>
+  <script src="/fireinit.js"></script>
+  <script type="text/javascript">
+
+    var temp = location.href.split("?");
+    var data=temp[1].split("\\?");
+    // var uid = data[0];
+    var bakery_name = decodeURI(decodeURIComponent(data[0]));
+    // document.write(uid);
+    console.log(bakery_name);
+
+    /* 로그아웃 버튼을 눌렀을 때 인증 해제 */
+    $('#BTN_LOGOUT').click(function()
+    {
+      firebase.auth().signOut().then(function()
+      {
+        alert("로그아웃 되셨습니다!");
+        window.location.href="login.html";
+      }, function(error)
+      {
+        alert(error.message);
+      });
+    });
+
+    /* 사진 업로드 눌렀을 떄 DB에 기록 */
+    $("#BTN_WRITE").click(function()
+    {
+      // 파일 선택이 안됬을 경우 등록 방지
+      if( _file == null )
+      {
+        alert("업로드할 파일을 선택해 주세요");
+        return false;
+      } // end of if
+
+      $("#PROGRESS").show(); // 프리로더 보이기
+      /* uploadTask를 이용해 선택된 파일을 등록 */
+      var storageRef = firebase.storage().ref(); // 스토리지의 root
+      var uploadTask = storageRef.child('Bakeries_Photos/' + bakery_name + '/' + _file.name).put(_file);
+      uploadTask.on('state_changed', function(snapshot){
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        // 참고 : https://firebase.google.com/docs/storage/web/upload-files#monitor_upload_progress
+      }, function(error)
+      { // 오류났을때
+        alert(error.message);
+        return false;
+      }, function()
+      { // 업로드 완료 시에
+        /* DB에 내용을 기록 */
+        var photo_name = $("#INPUT_MESSAGE").val();
+        var _filename = _file.name; // 4. 파일명으로 수정
+        firebase.database().ref('/BreadClockWeb/Bakeries/BasicInfo/'+ bakery_name + '/Photo/').set
+        ({
+          "photoName" : photo_name ,
+          "time" : firebase.database.ServerValue.TIMESTAMP ,
+          "filename" : _filename
+        });
+
+        /* 폼 및 요소 초기화 */
+        $("form").each(function()
+        {
+            this.reset();
+        });
+        _file = null; // 전역 파일 객체 초기화
+        $("#PROGRESS").hide(); // 프리로더 감추기
+      });
+    });
+
+    /* 파일객체 가져오기 */
+    var _file = null;
+    document.getElementById("INPUT_FILE").addEventListener("change", handleFiles, false);
+    function handleFiles()
+    {
+      _file = (this.files)[0];
+    }
+
+    /* DB에서 메모 내용 읽어오기 */
+    firebase.database().ref('/BreadClockWeb/Bakeries/BasicInfo/'+ bakery_name + '/Photo/').on('value', function(snapshot)
+    {
+      if (snapshot.val() == null )
+      {
+        $("#READ_PHOTO").append('<div class="collapsible-header">아직 등록된 파일이 없습니다.</div>');
+        $("#PROGRESS").hide();
+        return false;
+      }
+
+      var pName = snapshot.val().photoName;
+      var fName = snapshot.val().filename;
+      var date =  snapshot.val().time;
+      var uploadDate = new Date(date * 1000);
+
+      $("#PROGRESS").show(); // 프리로더 보이기
+      $("#READ_PHOTO").html("");
+
+      /* 매모 객체 하나씩 li요소로 변경해서 ul(#READ_PHOTO)에 추가  */
+      var _keys = Object.keys(snapshot.val());
+      // for (var i=_keys.length; 0<i; i--){
+      //   var child = snapshot.child(_keys[(i-1)]).val()
+      //   var uploadDate = new Date(child.time*1000);
+        console.log("이름" + pName);
+        console.log("파일이름" + fName);
+        var appendHTML =
+ '        <li>'
++'          <div class="collapsible-header"><i class="material-icons">subject</i>'+pName+'</div>'
++'          <div class="collapsible-body">'
++'              <p><span class="right"><button data-f="'+fName+'" class="btn deep-orange darken-4 BTN_DELETE">삭제</button>'
++'              </span>파일명 : '+fName+'<br>등록일 : '+uploadDate+'</p>'
++'            </div>'
++'        </li>';
+        $("#READ_PHOTO").append(appendHTML);
+
+      $("#PROGRESS").hide(); // 프리로더 감추기
+
+      /* 삭제 이벤트 연결 */
+      $(".BTN_DELETE").off("click");
+      $(".BTN_DELETE").click(function()
+      {
+        // 파일도 삭제 하기
+        var _filename = $(this).data("f");
+        console.log("이름" + _filename);
+        firebase.storage().ref('Bakeries_Photos/' + bakery_name + '/' +_filename).delete().then(function()
+        {
+          // 파일 삭제 성공
+        }).catch(function(error)
+        {
+          alert(error.message);
+        });
+        var _key = $(this).data("k");
+        firebase.database().ref('/BreadClockWeb/Bakeries/BasicInfo/'+ bakery_name + '/Photo/').child(_key).remove();
+      });
+
+      /*다운로드 작성 */
+      $(".BTN_DOWNLOAD").off("click");
+      $(".BTN_DOWNLOAD").click(function(){
+        var _filename = $(this).data("f");
+        firebase.storage().ref('Bakeries_Photos/' + bakery_name + '/' +_filename).getDownloadURL().then(function(url) {
+          console.log(url);
+          location.href=url;
+        }).catch(function(error) {
+          alert(error.message);
+        });
+      });
+    });
+
+  </script>
+
+</body>
+</html>

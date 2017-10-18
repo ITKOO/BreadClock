@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>빵클락 회원가입</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/> -->
+    <link type="text/css" rel="stylesheet" href="/css/materialize.css"  media="screen,projection"/>
+    <style> #CONTENTS{ min-height: 1000px; }</style>
+  </head>
+  <body>
+
+    <!-- 상단 네비게이션 -->
+    <nav class="deep-orange darken-1">
+      <div class="nav-wrapper">
+        <div class="container">
+          <a href="login.html" class="breadcrumb">BreadClock</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 내용 부분 -->
+    <div class="container" id="CONTENTS">
+      <form id="FRM">
+      <div class="row z-depth-1">
+      <div class="col s12"><h3>빵클락 회원가입</h3>
+      <!-- 빵집 이름 입력 -->
+      <div>
+      <label for="NAME">빵집 이름</label>
+      <input id="NAME" placeholder="빵집이름을 입력하세요" type="text">
+      </div>
+
+      <div>
+      <!-- 가입 메일 주소 입력 -->
+      <label for="EMAIL">Email</label>
+      <input id="EMAIL" placeholder="메일 주소를 입력하세요" type="email">
+      </div>
+
+      <div>
+      <!-- 가입 패스워드 입력 -->
+      <label for="PASSWORD">Password</label>
+      <input id="PASSWORD" placeholder="비밀 번호를 입력하세요" type="password">
+    </div>
+
+      <div>
+      <!-- 사업자 등록번호 입력 -->
+      <label for="BUSINESS_NUM">사업자 등록번호</label>
+      <input id="BUSINESS_NUM" placeholder="사업자 등록번호를 입력하세요" type="text">
+      </div>
+
+      <div>
+      <!-- 우편번호 입력 -->
+      <label for="ADDRESS_NUM">우편번호</label>
+      <input id="ADDRESS_NUM" placeholder="검색 버튼을 눌러주세요" type="text" class="postcodify_postcode5" readonly >
+    </div>
+
+      <div id = "postcodify">
+      <span class = "right"><button id="postcodify_search_button" class="btn deep-orange darken-4" type = "button">검색</button></span>
+    </div>
+
+      <div>
+      <br><br>
+      <!-- 도로명 주소 입력 -->
+      <label for="STREET_NUM">도로명 주소</label>
+      <input id="STREET_NUM" placeholder="검색 버튼을 눌러주세요"  type="text" class="postcodify_address" readonly>
+      </div>
+
+      <div>
+      <!-- 주소 입력 -->
+      <label for="ADDRESS_DETAIL">상세 주소</label>
+      <input id="ADDRESS_DETAIL" placeholder="예) 파리바게트 건대점" type="text" class="postcodify_details">
+      </div>
+
+      <div>
+      <!-- 주소 입력 -->
+      <label for="EXTRA_INFO">참고 항목</label>
+      <input id="EXTRA_INFO" placeholder="검색 버튼을 눌러주세요"  type="text" class="postcodify_extra_info" readonly>
+    </div>
+
+      <!-- 회원가입 버튼 -->
+      <span class = "right"><button id="BTN_SIGNUP" type="button"  class="btn deep-orange darken-4"> 회 원 가 입 </button></span>
+      <br><br><br>
+      <span id = "USER_UID" class = "blue-text"></span>
+      <br><br><br>
+
+</div>
+    </div>
+    </div>
+
+    <!-- 바닥글 영역 -->
+    <footer class="page-footer deep-orange darken-1">
+      <div class="container">
+      <div class="footer-copyright">
+        <div class="container">
+        Copyright &copy; BreadClock
+        <a class="white-text right" >developed by ITKOO</a>
+        </div>
+      </div>
+      </div>
+    </footer>
+  <!-- /////////////////////////////////// javascript 스크립트 영역 /////////////////////////////////// -->
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!-- <script src="./fireinit.js"></script> -->
+
+  <!-- jQuery와 Postcodify를 로딩한다 -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <script src="//d1p7wdleee1q2z.cloudfront.net/post/search.min.js"></script>
+
+  <!-- firebase SDK 링크-->
+  <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase-database.js"></script>
+
+    <script>
+    var config =
+    {
+      apiKey: "AIzaSyDP3CPGAdLP7vp4q2JTeVtu67DI5Dzg9dE",
+      authDomain: "stac-5db0e.firebaseapp.com",
+      databaseURL: "https://stac-5db0e.firebaseio.com",
+      projectId: "stac-5db0e",
+      storageBucket: "stac-5db0e.appspot.com",
+      messagingSenderId: "937083530677"
+    };
+
+    firebase.initializeApp(config);
+
+    /*"검색" 단추를 누르면 주소 검색하는 창 출현*/
+   $(function() { $("#postcodify_search_button").postcodifyPopUp(); });
+
+    //파베 디비 쓰기 위한 준비 작업
+
+    // var uid = document.getElementById('USER_UID');
+
+    var database = firebase.database();
+    //uid 받기위해 회원가입 사용자 유저
+    var bc_user;
+
+    $('#BTN_SIGNUP').click(function()
+    {
+      //빵집이름 값 변수로 가져오기
+      //빵집 이름
+      var name = $("#NAME").val();
+      // 메일
+      var email = $("#EMAIL").val();
+      // 비밀번호
+      var password = $("#PASSWORD").val();
+      // 사업자 등록번호
+      var business_num = $("#BUSINESS_NUM").val();
+      //우편 번호
+      var address_num = $("#ADDRESS_NUM").val();
+      // 도로명 주소
+      var street_num = $("#STREET_NUM").val();
+      // 자세한 주소
+      var detail_num = $("#ADDRESS_DETAIL").val();
+      // 더 자세한 주소
+      var extra_info = $("#EXTRA_INFO").val();
+
+      var uid = $("#USER_UID").val();
+
+
+      //메일 회원가입에 성공했을 경우
+      firebase.auth().createUserWithEmailAndPassword(email, password).then(
+      function()
+      {
+          var user = firebase.auth().currentUser;
+          bc_user = user;
+          // // console.log(bc_user.uid);
+          // console.log(bc_user.name);
+
+          var bc_user_uid = bc_user.uid;
+          // var bc_user_name = bc_user.name;
+
+          firebase.database().ref('BreadClockWeb/Bakeries/BasicInfo/' + name + '/SignUpInfo/').set(
+          {
+              'UID' : bc_user_uid,
+              'name' : name,
+              'email' : email,
+              'password' :  password,
+              'business_num' : business_num,
+              'address_num' : address_num,
+              ' street_num' : street_num,
+              'detail_num': detail_num,
+              ' extra_info' : extra_info
+          });
+
+          firebase.database().ref('BreadClockWeb/Bakeries/LoginInfo/' + bc_user_uid).set(
+          {
+                'bakeryName' : name
+          }).then(function()
+          {
+              // 회원 정보 갱신 = 페이지 새로 고침
+              // location.href="5.html?" + bc_user_uid
+              alert("빵클락 가입을 축하드립니다!");
+              window.location.href="upload_info.html?" + name + "?";
+              // location.href="pratice.html
+              // window.location.href="pratice.html";
+              // location.reload();
+
+              // location.reload();
+            }, function(error)
+            {
+                console.log(error);
+                alert(error.message);
+            });
+            // 자동 로그인 성공으로 간주 = onAuthStateChanged() 가 동작함
+            }).catch(function(error){
+            //메일 회원 가입에 실패 했을 때
+            alert(error.message);
+            });
+      });
+
+   </script>
+  </body>
+</html>

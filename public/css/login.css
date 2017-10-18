@@ -1,0 +1,37 @@
+body {
+    /*background-image: url("../img/web_login.png");*/
+    background-image: url("../img/web_login_bg.png");
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+img
+{
+  width: 200px;
+  height:200px;
+
+}
+
+h4
+{
+  color: #bf360c;
+}
+
+a
+{
+    color: #bf360c;
+}
+
+a:hover
+{
+    color: #fff;
+    /*background-color: #bf360c;*/
+    text-shadow:
+   -1px -1px 0 #bf360c,
+    1px -1px 0 #bf360c,
+    -1px 1px 0 #bf360c,
+     1px 1px 0 #bf360c;
+
+}

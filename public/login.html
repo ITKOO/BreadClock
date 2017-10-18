@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>빵클락 로그인 페이지</title>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="/css/materialize.css"  media="screen,projection"/>
+  <link type="text/css" rel="stylesheet" href="/css/login.css"  media="screen,projection"/>
+  <style> #CONTENTS{ min-height: 1000px;}</style>
+</head>
+
+<body>
+<!-- 내용 부분 -->
+<div class="container" id="CONTENTS">
+  <div class = "icon">
+    <center>
+    <img src = "../img/icon_breadclock.png">
+    </center>
+  </div>
+
+  <div class="container" id="CONTENTS">
+    <div class = "card-panel orange lighten-5">
+    <form id="FRM">
+    <div class="row">
+      <center><h4>LOGIN</h4></center><br><br>
+      <div class="input-field col s12">
+        <!-- 로그인 메일 주소 입력 폼 -->
+        <input id="SIGNIN_MAIL" placeholder="메일 주소를 입력하세요" type="email" class="validate">
+        <label for="SIGNIN_MAIL">Email</label>
+      </div>
+      <div class="input-field col s12">
+        <!-- 로그인 패스워드 입력 폼 -->
+        <input id="SIGNIN_PASSWORD" placeholder="비밀 번호를 입력하세요" type="password" class="validate">
+        <label for="SIGNIN_PASSWORD">Password</label>
+      </div>
+      <div class="input-field col s12">
+        <!-- 로그인 버튼  -->
+        <br><center><button id="BTN_SIGNIN" type="button" class="btn deep-orange darken-4"> 회 원 로 그 인 </button></center>
+      </div>
+
+      <div class="input-field col s12">
+        <br>
+        <p class="text"><center>회원이 아니신가요? <a href="sign_up.html"> &nbsp;가입하기</a></center></p>
+        <br>
+        <p class="text"><a href="index.html"><center>빵클락 웹페이지로 돌아가기</a></center></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  </div><!-- end card-content div -->
+</div>
+</div>
+</form>
+</div>
+
+<!-- /////////////////////////////////// javascript 스크립트 영역 /////////////////////////////////// -->
+
+
+  <!--Import jQuery before materialize.js-->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="/js/materialize.min.js"></script>
+
+  <!-- jQuery와 Postcodify를 로딩한다 -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <script src="//d1p7wdleee1q2z.cloudfront.net/post/search.min.js"></script>
+
+
+  <!-- firebase SDK 링크 -->
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase-storage.js"></script>
+  <script src="/fireinit.js"></script>
+  <script type="text/javascript">
+    /* 인증 상태 변화 감시하기 */
+    firebase.auth().onAuthStateChanged(function(user)
+    {
+      if(user)
+      {
+        //인증 되었을 때
+        window.location.href="upload_info.html?" + bName + "?";
+      }
+      else
+      {
+          console.log("error");
+      }
+    });
+
+    /*"검색" 단추를 누르면 팝업 레이어가 열리도록 설정한다*/
+    $(function() { $("#postcodify_search_button").postcodifyPopUp(); });
+
+
+    /* 로그인 버튼 클릭시 처리하기 */
+    $('#BTN_SIGNIN').click(function(){
+      var signin_mail = $('#SIGNIN_MAIL').val();
+      var signin_password = $('#SIGNIN_PASSWORD').val();
+
+      firebase.auth().signInWithEmailAndPassword(signin_mail, signin_password).then(function()
+      {
+        // 메일 회원  로그인 성공으로 간주 = onAuthStateChanged()가 동작함
+        var user = firebase.auth().currentUser;
+        console.log("UID : " + user.uid);
+        console.log("user맞음");
+        firebase.database().ref('/BreadClockWeb/Bakeries/LoginInfo/'+ user.uid).on('value', function(snapshot)
+        {
+              console.log("snapshot");
+              var bName = snapshot.val().bakeryName;
+              console.log("빵집이름 : " + bName);
+              window.location.href="upload_info.html?" + bName + "?";
+              alert("빵클락 로그인 성공!");
+      })
+
+    }).catch(function(error)
+    {
+        // 회원 로그인에 실패 했을 경우
+        alert(error.message);
+      });
+    });
+
+  </script>
+  </body>
+</html>
