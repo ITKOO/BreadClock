@@ -1,0 +1,36 @@
+[debug] [2017-10-18T06:05:44.640Z] ----------------------------------------------------------------------
+[debug] [2017-10-18T06:05:44.655Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Samsung\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2017-10-18T06:05:44.657Z] CLI Version:   3.12.0
+[debug] [2017-10-18T06:05:44.658Z] Platform:      win32
+[debug] [2017-10-18T06:05:44.658Z] Node Version:  v6.11.2
+[debug] [2017-10-18T06:05:44.661Z] Time:          Wed Oct 18 2017 15:05:44 GMT+0900 (대한민국 표준시)
+[debug] [2017-10-18T06:05:44.662Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2017-10-18T06:05:44.754Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2017-10-18T06:05:44.757Z] > authorizing via signed-in user
+[debug] [2017-10-18T06:05:44.770Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2017-10-18T06:05:44.772Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token { refresh_token: '1/zlcuI2-jo8BeuZMQumh3pVKL1bb9LfZ0Jib1sbSXETY',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Wed Oct 18 2017 15:05:44 GMT+0900 (대한민국 표준시)
+[debug] [2017-10-18T06:05:45.863Z] <<< HTTP RESPONSE 200
+[debug] [2017-10-18T06:05:45.902Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/stac-5db0e  
+ Wed Oct 18 2017 15:05:45 GMT+0900 (대한민국 표준시)
+[debug] [2017-10-18T06:05:47.261Z] <<< HTTP RESPONSE 200
+[debug] [2017-10-18T06:05:47.264Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/stac-5db0e/tokens  
+ Wed Oct 18 2017 15:05:47 GMT+0900 (대한민국 표준시)
+[debug] [2017-10-18T06:05:48.473Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'D:\breadclock_website'...
+[info] 
+[debug] [2017-10-18T06:05:48.488Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/stac-5db0e  
+ Wed Oct 18 2017 15:05:48 GMT+0900 (대한민국 표준시)
+[debug] [2017-10-18T06:05:49.757Z] <<< HTTP RESPONSE 200
+[debug] [2017-10-18T06:05:49.759Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/937083530677/clients/_:getWebAppConfig  
+ Wed Oct 18 2017 15:05:49 GMT+0900 (대한민국 표준시)
+[debug] [2017-10-18T06:05:51.993Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: public
+[info] +  hosting: Local server: http://localhost:5000
+
